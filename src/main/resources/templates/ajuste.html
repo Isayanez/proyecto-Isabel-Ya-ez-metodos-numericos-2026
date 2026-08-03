@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajuste de Curvas - Métodos Numéricos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-dark .navbar-nav .nav-link.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .card-header-custom {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar superior con navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-4" href="/">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'raices'} ? 'active'" href="/raices">1. Raíces</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'sistemas-lineales'} ? 'active'" href="/sistemas-lineales">2. Sistemas Lineales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'ajuste-curvas'} ? 'active'" href="/ajuste-curvas">3. Ajuste Curvas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'derivacion'} ? 'active'" href="/derivacion">4. Derivación</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'integracion'} ? 'active'" href="/integracion">5. Integración</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'ecuaciones-diferenciales'} ? 'active'" href="/ecuaciones-diferenciales">6. Ecuaciones Dif.</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container py-4">
+        <div class="card shadow border-0 mb-4">
+            <!-- Banner Azul -->
+            <div class="card-header card-header-custom py-3 px-4">
+                <h3 class="m-0 fs-4">Ajuste de Curvas</h3>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted mb-4">Ajuste de datos mediante Regresión Lineal y Regresión Polinomial por Mínimos Cuadrados.</p>
+
+                <div class="row g-4">
+                    <!-- Columna Izquierda: Parámetros -->
+                    <div class="col-md-5">
+                        <div class="card border border-light-subtle shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Parámetros</h5>
+
+                                <div class="mb-3">
+                                    <label for="tipoAjuste" class="form-label fw-bold">Tipo de Ajuste:</label>
+                                    <select id="tipoAjuste" class="form-select" onchange="toggleGrado()">
+                                        <option value="LINEAL">Regresión Lineal</option>
+                                        <option value="POLINOMIAL">Regresión Polinomial</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="divGrado" style="display: none;">
+                                    <label for="grado" class="form-label fw-bold">Grado del Polinomio:</label>
+                                    <input type="number" id="grado" class="form-control" value="2" min="2" max="6">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="puntosX" class="form-label fw-bold">Valores de X (separados por coma):</label>
+                                    <input type="text" id="puntosX" class="form-control" placeholder="Ej. 1, 2, 3, 4, 5" value="1, 2, 3, 4, 5">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="puntosY" class="form-label fw-bold">Valores de Y (separados por coma):</label>
+                                    <input type="text" id="puntosY" class="form-control" placeholder="Ej. 2.1, 3.8, 6.2, 8.1, 10.2" value="2.1, 3.8, 6.2, 8.1, 10.2">
+                                </div>
+
+                                <button class="btn btn-success btn-lg w-100 mt-2 fw-bold" onclick="calcularAjuste()">Calcular Ajuste</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Resultados -->
+                    <div class="col-md-7">
+                        <div class="card border border-light-subtle shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Resultados</h5>
+                                <div id="alertaError" class="alert alert-danger d-none"></div>
+
+                                <div id="resultadoBox" style="display: none;">
+                                    <div class="p-3 mb-3 bg-light rounded border">
+                                        <h6 class="text-secondary fw-bold">Ecuación Ajustada:</h6>
+                                        <p id="ecuacionTxt" class="fs-4 text-primary fw-bold m-0"></p>
+                                    </div>
+
+                                    <div class="p-3 bg-light rounded border">
+                                        <h6 class="text-secondary fw-bold">Coeficiente de Determinación (R²):</h6>
+                                        <p id="r2Txt" class="fs-5 fw-bold text-success m-0"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de cálculo -->
+    <script>
+        function toggleGrado() {
+            const tipo = document.getElementById("tipoAjuste").value;
+            document.getElementById("divGrado").style.display = (tipo === "POLINOMIAL") ? "block" : "none";
+        }
+
+        async function calcularAjuste() {
+            const errorBox = document.getElementById("alertaError");
+            const resultBox = document.getElementById("resultadoBox");
+            errorBox.classList.add("d-none");
+
+            const xStr = document.getElementById("puntosX").value;
+            const yStr = document.getElementById("puntosY").value;
+
+            const body = {
+                tipoAjuste: document.getElementById("tipoAjuste").value,
+                gradoPolinomio: parseInt(document.getElementById("grado").value),
+                puntosX: xStr,
+                puntosY: yStr
+            };
+
+            try {
+                const resp = await fetch('/api/ajuste/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await resp.json();
+
+                if (!resp.ok || !data.exito) {
+                    errorBox.innerText = data.mensaje || "Error al realizar el cálculo.";
+                    errorBox.classList.remove("d-none");
+                    resultBox.style.display = "none";
+                    return;
+                }
+
+                document.getElementById("ecuacionTxt").innerText = data.ecuacion;
+                document.getElementById("r2Txt").innerText = (data.r2 * 100).toFixed(2) + "%  (R² = " + data.r2 + ")";
+                resultBox.style.display = "block";
+
+            } catch (err) {
+                errorBox.innerText = "Error de comunicación con el servidor: " + err.message;
+                errorBox.classList.remove("d-none");
+                resultBox.style.display = "none";
+            }
+        }
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"></script>
+</body>
+</html>

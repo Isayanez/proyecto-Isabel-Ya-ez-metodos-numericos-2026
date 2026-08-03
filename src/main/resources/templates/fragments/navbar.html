@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <!-- Fragmento de Barra de Navegación -->
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" th:href="@{/raices}">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'raices'} ? 'active fw-bold' : ''" th:href="@{/raices}">1. Raíces</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Se corrigió el endpoint a /sistemas-lineales -->
+                        <a class="nav-link" th:classappend="${moduloActivo == 'sistemas'} ? 'active fw-bold' : ''" th:href="@{/sistemas-lineales}">2. Sistemas Lineales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'ajuste'} ? 'active fw-bold' : ''" th:href="@{/ajuste}">3. Ajuste Curvas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'derivacion'} ? 'active fw-bold' : ''" th:href="@{/derivacion}">4. Derivación</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'integracion'} ? 'active fw-bold' : ''" th:href="@{/integracion}">5. Integración</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${moduloActivo == 'ecuaciones'} ? 'active fw-bold' : ''" th:href="@{/ecuaciones}">6. Ecuaciones Dif.</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+</body>
+</html>

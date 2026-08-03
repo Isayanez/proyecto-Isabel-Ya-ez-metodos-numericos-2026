@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Métodos Numéricos - Cálculo de Raíces</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Fragmento de Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-9">
+
+                <!-- TARJETA DEL FORMULARIO -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Cálculo de Raíces de Funciones</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-raices" onsubmit="calcularRaiz(event)">
+                            
+                            <!-- Selección del Método -->
+                            <div class="mb-3">
+                                <label for="metodo" class="form-label fw-bold">Método Numérico:</label>
+                                <select id="metodo" class="form-select" onchange="actualizarCampos()">
+                                    <option value="REGLA_FALSA">Regla Falsa</option>
+                                    <option value="PUNTO_FIJO">Iteración de Punto Fijo</option>
+                                    <option value="NEWTON_RAPHSON">Newton-Raphson</option>
+                                    <option value="SECANTE">Secante</option>
+                                    <option value="SECANTE_MODIFICADO">Secante Modificado</option>
+                                </select>
+                            </div>
+
+                            <!-- Función f(x) -->
+                            <div class="mb-3">
+                                <label for="funcion" class="form-label fw-bold">Función f(x):</label>
+                                <input type="text" id="funcion" class="form-control" placeholder="Ej. x^3 - 2*x - 5" required>
+                                <div class="form-text">Sintaxis explícita con asteriscos para multiplicación (ej: <code>2*x</code> o <code>x^2</code>).</div>
+                            </div>
+
+                            <!-- Parámetros del Método -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6" id="grupo-x0">
+                                    <label for="x0" id="label-x0" class="form-label fw-bold">Valor a / x0:</label>
+                                    <input type="number" step="any" id="x0" class="form-control" placeholder="0.0" required>
+                                </div>
+                                <div class="col-md-6" id="grupo-x1">
+                                    <label for="x1" id="label-x1" class="form-label fw-bold">Valor b / x1:</label>
+                                    <input type="number" step="any" id="x1" class="form-control" placeholder="1.0">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="tolerancia" class="form-label fw-bold">Tolerancia (%):</label>
+                                    <input type="number" step="any" id="tolerancia" class="form-control" placeholder="0.0001" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="maxIteraciones" class="form-label fw-bold">Max. Iteraciones:</label>
+                                    <input type="number" id="maxIteraciones" class="form-control" placeholder="100" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold">Calcular Raíz</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ALERTA DE ERROR -->
+                <div id="alert-error" class="alert alert-danger d-none" role="alert"></div>
+
+                <!-- SECCIÓN DE RESULTADOS -->
+                <div id="seccion-resultados" class="card shadow-sm mb-4 d-none">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Resultado del Cálculo</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Raíz Aproximada</small>
+                                    <strong id="res-raiz" class="fs-5 text-primary">0.0000</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Iteraciones</small>
+                                    <strong id="res-iteraciones" class="fs-5 text-secondary">0</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Error Final (%)</small>
+                                    <strong id="res-error" class="fs-5 text-danger">0.00%</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de Iteraciones -->
+                        <h6 class="fw-bold mt-4 mb-2">Tabla de Iteraciones</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped text-center align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>i</th>
+                                        <th>xi</th>
+                                        <th>f(xi)</th>
+                                        <th>Error (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function actualizarCampos() {
+            const metodo = document.getElementById('metodo').value;
+            const grupoX1 = document.getElementById('grupo-x1');
+            const inputX1 = document.getElementById('x1');
+            const labelX0 = document.getElementById('label-x0');
+            const labelX1 = document.getElementById('label-x1');
+
+            if (metodo === 'PUNTO_FIJO' || metodo === 'NEWTON_RAPHSON') {
+                grupoX1.style.display = 'none';
+                inputX1.removeAttribute('required');
+                inputX1.value = '';
+                labelX0.innerText = 'Valor inicial (x0):';
+            } else if (metodo === 'SECANTE_MODIFICADO') {
+                grupoX1.style.display = 'block';
+                inputX1.setAttribute('required', 'true');
+                labelX0.innerText = 'Valor inicial (x0):';
+                if (labelX1) labelX1.innerText = 'Delta (δ):';
+            } else {
+                grupoX1.style.display = 'block';
+                inputX1.setAttribute('required', 'true');
+                labelX0.innerText = 'Valor a / x0:';
+                if (labelX1) labelX1.innerText = 'Valor b / x1:';
+            }
+        }
+
+        function formatearNumero(val) {
+            if (val === null || val === undefined || isNaN(val)) return 'N/A';
+            const num = Number(val);
+            if (Math.abs(num) < 0.0001 && num !== 0) {
+                return num.toExponential(4);
+            }
+            return num.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+        }
+
+        async function calcularRaiz(event) {
+            event.preventDefault();
+
+            const alertError = document.getElementById('alert-error');
+            const seccionResultados = document.getElementById('seccion-resultados');
+            alertError.classList.add('d-none');
+
+            const payload = {
+                metodo: document.getElementById('metodo').value,
+                funcion: document.getElementById('funcion').value,
+                x0: parseFloat(document.getElementById('x0').value),
+                x1: document.getElementById('x1').value ? parseFloat(document.getElementById('x1').value) : null,
+                tolerancia: parseFloat(document.getElementById('tolerancia').value),
+                maxIteraciones: parseInt(document.getElementById('maxIteraciones').value)
+            };
+
+            try {
+                const response = await fetch('/api/raices/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const mensajeBackend = data.mensaje || data.message || data.error || `Error en el cálculo (${response.status})`;
+                    throw new Error(mensajeBackend);
+                }
+
+                // Si el backend responde 200 pero indicó que no convergió o devolvió un mensaje de error
+                if (data.convergio === false || (data.mensaje && data.mensaje.toLowerCase().includes('error'))) {
+                    throw new Error(data.mensaje || 'Error en el cálculo o el método no convergió.');
+                }
+
+                // Mapeo flexible de propiedades que coinciden con tu DTO Java (data.raiz, data.iteraciones, etc.)
+                const raizVal = data.raiz ?? data.root;
+                const errorVal = data.errorRelativo ?? data.errorFinal ?? data.error;
+                const iterVal = data.iteraciones ?? data.iteracionesRealizadas ?? 0;
+
+                document.getElementById('res-raiz').innerText = formatearNumero(raizVal);
+                document.getElementById('res-iteraciones').innerText = iterVal;
+                document.getElementById('res-error').innerText = errorVal !== undefined && errorVal !== null ? `${formatearNumero(errorVal)}%` : '0.00%';
+
+                // Renderizar la tabla de iteraciones
+                const tbody = document.getElementById('tabla-body');
+                tbody.innerHTML = '';
+
+                const iteraciones = data.tablaIteraciones || data.iteracionesList || [];
+                iteraciones.forEach(it => {
+                    const tr = document.createElement('tr');
+                    const numIter = it.numero ?? it.iteracion ?? it.i ?? '';
+                    const xiVal = it.xi ?? it.x ?? '';
+                    const fxiVal = it.fxi ?? it.fx ?? '';
+                    const errVal = it.error ?? it.errorRelativo ?? it.ea ?? '';
+
+                    tr.innerHTML = `
+                        <td>${numIter}</td>
+                        <td>${formatearNumero(xiVal)}</td>
+                        <td>${formatearNumero(fxiVal)}</td>
+                        <td>${errVal !== '' ? formatearNumero(errVal) : '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                seccionResultados.classList.remove('d-none');
+            } catch (err) {
+                seccionResultados.classList.add('d-none');
+                alertError.innerText = err.message || 'Ocurrió un error al procesar la solicitud.';
+                alertError.classList.remove('d-none');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', actualizarCampos);
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

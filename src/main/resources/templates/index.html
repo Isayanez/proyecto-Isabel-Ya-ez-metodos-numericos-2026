@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos Numéricos - Portada</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .cover-card {
+            max-width: 800px;
+            margin: 40px auto;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            background: #ffffff;
+            overflow: hidden;
+        }
+        .logo-img {
+            max-width: 280px;
+            height: auto;
+        }
+        .header-title {
+            color: #0d6efd;
+            font-weight: 700;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menú Superior Directo -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" th:href="@{/}">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/raices}">1. Raíces</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/sistemas-lineales}">2. Sistemas Lineales</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ajuste}">3. Ajuste Curvas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/derivacion}">4. Derivación</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/integracion}">5. Integración</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ecuaciones-diferenciales}">6. Ecuaciones Dif.</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card cover-card p-4 p-md-5 text-center">
+            
+            <!-- Logo de la Escuela -->
+            <div class="mb-4">
+                <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="Instituto Sanmiguelense" class="logo-img" onerror="this.style.display='none'">
+            </div>
+
+            <h3 class="text-uppercase tracking-wider text-muted mb-2" style="font-size: 1.1rem; letter-spacing: 2px;">
+                Instituto Sanmiguelense | San Miguel de Allende
+            </h3>
+
+            <hr class="my-4" style="width: 60%; margin: 0 auto; opacity: 0.15;">
+
+            <!-- Título del Proyecto -->
+            <h1 class="header-title mb-4">
+                Proyecto de Métodos Numéricos en JAVA
+            </h1>
+
+            <!-- Datos del Proyecto -->
+            <div class="row g-3 justify-content-center text-start my-2 mx-auto" style="max-width: 500px;">
+                <div class="col-12 p-2 border-bottom">
+                    <span class="info-label"><i class="bi bi-book-half me-2 text-primary"></i>Materia:</span>
+                    <span class="info-value float-end fw-bold">Métodos Numéricos</span>
+                </div>
+                <div class="col-12 p-2 border-bottom">
+                    <span class="info-label"><i class="bi bi-person-fill me-2 text-primary"></i>Alumno:</span>
+                    <span class="info-value float-end fw-bold">Maria Isabel Yañez Ramirez</span>
+                </div>
+                <div class="col-12 p-2 border-bottom">
+                    <span class="info-label"><i class="bi bi-person-badge-fill me-2 text-primary"></i>Profesor:</span>
+                    <span class="info-value float-end fw-bold">Iván Tovar Balderas</span>
+                </div>
+                <div class="col-12 p-2 border-bottom">
+                    <span class="info-label"><i class="bi bi-calendar-event-fill me-2 text-primary"></i>Año:</span>
+                    <span class="info-value float-end fw-bold">2026</span>
+                </div>
+            </div>
+
+            <!-- Accesos rápidos a los módulos -->
+            <div class="mt-5">
+                <p class="text-muted mb-3">Módulos del Sistema:</p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a th:href="@{/raices}" class="btn btn-outline-primary btn-sm">1. Raíces</a>
+                    <a th:href="@{/sistemas-lineales}" class="btn btn-outline-primary btn-sm">2. Sistemas Lineales</a>
+                    <a th:href="@{/ajuste}" class="btn btn-outline-primary btn-sm">3. Ajuste Curvas</a>
+                    <a th:href="@{/derivacion}" class="btn btn-outline-primary btn-sm">4. Derivación</a>
+                    <a th:href="@{/integracion}" class="btn btn-outline-primary btn-sm">5. Integración</a>
+                    <a th:href="@{/ecuaciones-diferenciales}" class="btn btn-outline-primary btn-sm">6. Ecuaciones Dif.</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/bootstrap.bundle.min.js"></script>
+</body>
+</html>

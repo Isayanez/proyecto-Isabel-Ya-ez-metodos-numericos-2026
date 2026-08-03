@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integración Numérica - Métodos Numéricos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-dark .navbar-nav .nav-link.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .card-header-custom {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar superior -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-4" href="/">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/raices">1. Raíces</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sistemas-lineales">2. Sistemas Lineales</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ajuste-curvas">3. Ajuste Curvas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/derivacion">4. Derivación</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/integracion">5. Integración</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ecuaciones-diferenciales">6. Ecuaciones Dif.</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container py-4">
+        <div class="card shadow border-0 mb-4">
+            <div class="card-header card-header-custom py-3 px-4">
+                <h3 class="m-0 fs-4">Integración Numérica</h3>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted mb-4">Cálculo de integrales definidas por la Regla del Trapecio, Simpson 1/3 y Simpson 3/8.</p>
+
+                <div class="row g-4">
+                    <!-- Formulario de Parámetros -->
+                    <div class="col-md-5">
+                        <div class="card border border-light-subtle shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Parámetros</h5>
+
+                                <div class="mb-3">
+                                    <label for="funcion" class="form-label fw-bold">Función f(x):</label>
+                                    <input type="text" id="funcion" class="form-control" value="0.2 + 25*x - 200*x^2 + 675*x^3 - 900*x^4 + 400*x^5" placeholder="Ej. x^2, sin(x)">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="limA" class="form-label fw-bold">Límite a:</label>
+                                        <input type="number" id="limA" class="form-control" value="0.0" step="any">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="limB" class="form-label fw-bold">Límite b:</label>
+                                        <input type="number" id="limB" class="form-control" value="0.8" step="any">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="subintervalos" class="form-label fw-bold">Subintervalos (n):</label>
+                                    <input type="number" id="subintervalos" class="form-control" value="6" min="1">
+                                    <div class="form-text text-muted" id="ayudaN">Simpson 1/3 requiere n par. Simpson 3/8 requiere n múltiplo de 3.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="metodo" class="form-label fw-bold">Método:</label>
+                                    <select id="metodo" class="form-select">
+                                        <option value="TRAPECIO">Regla del Trapecio</option>
+                                        <option value="SIMPSON_13">Regla de Simpson 1/3</option>
+                                        <option value="SIMPSON_38">Regla de Simpson 3/8</option>
+                                    </select>
+                                </div>
+
+                                <button class="btn btn-success btn-lg w-100 mt-2 fw-bold" onclick="calcularIntegracion()">Calcular Integral</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div class="col-md-7">
+                        <div class="card border border-light-subtle shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Resultados</h5>
+                                <div id="alertaError" class="alert alert-danger d-none"></div>
+
+                                <div id="resultadoBox" style="display: none;">
+                                    <div class="p-3 mb-3 bg-light rounded border">
+                                        <h6 class="text-secondary fw-bold">Área Aproximada (I):</h6>
+                                        <p id="resultadoTxt" class="fs-3 text-primary fw-bold m-0"></p>
+                                    </div>
+
+                                    <div class="p-3 mb-3 bg-light rounded border">
+                                        <h6 class="text-secondary fw-bold">Método / Esquema:</h6>
+                                        <p id="metodoTxt" class="fs-6 font-monospace text-dark m-0"></p>
+                                    </div>
+
+                                    <div class="p-3 bg-light rounded border">
+                                        <h6 class="text-secondary fw-bold">Ancho del Subintervalo (h):</h6>
+                                        <p id="hTxt" class="fs-6 fw-bold text-muted m-0"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function calcularIntegracion() {
+            const errorBox = document.getElementById("alertaError");
+            const resultBox = document.getElementById("resultadoBox");
+            errorBox.classList.add("d-none");
+
+            const body = {
+                funcion: document.getElementById("funcion").value,
+                a: parseFloat(document.getElementById("limA").value),
+                b: parseFloat(document.getElementById("limB").value),
+                n: parseInt(document.getElementById("subintervalos").value),
+                metodo: document.getElementById("metodo").value
+            };
+
+            try {
+                const resp = await fetch('/api/integracion/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await resp.json();
+
+                if (!resp.ok || !data.exito) {
+                    errorBox.innerText = data.mensaje || "Error al calcular la integración.";
+                    errorBox.classList.remove("d-none");
+                    resultBox.style.display = "none";
+                    return;
+                }
+
+                document.getElementById("resultadoTxt").innerText = data.resultado;
+                document.getElementById("metodoTxt").innerText = data.detalleMetodo;
+                document.getElementById("hTxt").innerText = "h = (b - a) / n = " + data.h;
+                resultBox.style.display = "block";
+
+            } catch (err) {
+                errorBox.innerText = "Error de conexión con el servidor: " + err.message;
+                errorBox.classList.remove("d-none");
+                resultBox.style.display = "none";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
