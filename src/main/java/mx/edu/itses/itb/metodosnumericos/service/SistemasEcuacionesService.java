@@ -1,4 +1,4 @@
-package mx.edu.itses/itb/metodosnumericos.service;
+package mx.edu.itses.itb.metodosnumericos.service;
 
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
